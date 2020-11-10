@@ -31,10 +31,10 @@ substitutions:
     #Repository Specific configuration. DevOps can change this settings
     _DEPLOYMENTNAME: demo-java
     _CONTAINERNAME: demo-container    
-    _REPO_NAME: demo-repo
+    _REPO_NAME: Demo
     
     # Developers ONLY change
-    _VERSION: v1.0
+    _VERSION: latest
     
 options:
     substitution_option: 'ALLOW_LOOSE'
