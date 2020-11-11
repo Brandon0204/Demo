@@ -1,45 +1,55 @@
 steps:
-#First Clone from Google Cloud Source Repository  
-- name: 'gcr.io/cloud-builders/git'
-  args: ['clone','https://github.com/Brandon0204/Demo']
-- name: 'bash'
-  args: ['echo', 'I am running a bash command']
+  #First Clone from Google Cloud Source Repository
+  - name: 'gcr.io/cloud-builders/git'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        git clone --branch master https://github.com/Brandon0204/Demo /tmp/repo ;
+        cd /tmp/repo
+        chmod 777 version.sh
+        sh ./version.sh
+        git config --global user.name Brandon0204
+        git config --global user.email yuezhang2014@gmail.com
+        git add .
+        git commit -m 'version'
+        git push https://Brandon0204:Jingjing0721@github.com/Brandon0204/Demo.git --all
+  - name: 'gcr.io/cloud-builders/git'
+    args: [ 'clone','https://github.com/Brandon0204/Demo' ]
+  #Build the image
+  - name: 'gcr.io/cloud-builders/docker'
+    args: [ 'build','-t','gcr.io/${_PROJECT}/${_CONTAINERNAME}:${_VERSION}','.' ]
 
+  #Push the image
+  - name: 'gcr.io/cloud-builders/docker'
+    args: [ 'push','gcr.io/${_PROJECT}/${_CONTAINERNAME}:${_VERSION}' ]
 
-##Build the image
-#- name: 'gcr.io/cloud-builders/docker'
-#  args: ['build','-t','gcr.io/${_PROJECT}/${_CONTAINERNAME}:${_VERSION}','.']
-#
-##Push the image
-#- name: 'gcr.io/cloud-builders/docker'
-#  args: ['push','gcr.io/${_PROJECT}/${_CONTAINERNAME}:${_VERSION}']
-#
-##Update the container image using kubectl set
-#- name: 'gcr.io/cloud-builders/kubectl'
-#  args:
-#  - '-n'
-#  - '${_DEPLOYMENTNAME}'
-#  - 'set'
-#  - 'image'
-#  - 'deployment/${_DEPLOYMENTNAME}'
-#  - '${_CONTAINERNAME}=gcr.io/${_PROJECT}/${_CONTAINERNAME}:${_VERSION}'
-#  env:
-#  - 'CLOUDSDK_COMPUTE_ZONE=${_ZONE}'
-#  - 'CLOUDSDK_CONTAINER_CLUSTER=${_GKE_CLUSTER}'
-  
+  #Update the container image using kubectl set
+  - name: 'gcr.io/cloud-builders/kubectl'
+    args:
+      - '-n'
+      - '${_DEPLOYMENTNAME}'
+      - 'set'
+      - 'image'
+      - 'deployment/${_DEPLOYMENTNAME}'
+      - '${_CONTAINERNAME}=gcr.io/${_PROJECT}/${_CONTAINERNAME}:${_VERSION}'
+    env:
+      - 'CLOUDSDK_COMPUTE_ZONE=${_ZONE}'
+      - 'CLOUDSDK_CONTAINER_CLUSTER=${_GKE_CLUSTER}'
+
 substitutions:
-    #GCP Specific configuration. Please DON'T change anything
-    _PROJECT: brandon-profile
-    _ZONE: australia-southeast1-c
-    _GKE_CLUSTER: demo-cluster
-    
-    #Repository Specific configuration. DevOps can change this settings
-    _DEPLOYMENTNAME: demo-java
-    _CONTAINERNAME: demo-container    
-    _REPO_NAME: Demo
-    
-    # Developers ONLY change
-    _VERSION: v2.2
-    
+  #GCP Specific configuration. Please DON'T change anything
+  _PROJECT: brandon-profile
+  _ZONE: australia-southeast1-c
+  _GKE_CLUSTER: demo-cluster
+
+  #Repository Specific configuration. DevOps can change this settings
+  _DEPLOYMENTNAME: demo-java
+  _CONTAINERNAME: demo-container
+  _REPO_NAME: Demo
+
+  # Developers ONLY change
+  _VERSION: v2.2
+
 options:
-    substitution_option: 'ALLOW_LOOSE'
+  substitution_option: 'ALLOW_LOOSE'
