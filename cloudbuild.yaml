@@ -49,7 +49,7 @@ substitutions:
   _REPO_NAME: Demo
 
   # Developers ONLY change
-  _VERSION: v3.4
+  _VERSION: v3.5
 
 options:
   substitution_option: 'ALLOW_LOOSE'
